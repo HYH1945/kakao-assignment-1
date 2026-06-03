@@ -25,7 +25,7 @@ def get_messages(user_id: Optional[int] = None):  # user_id는 선택 파라미�
         # user_id 조건이 있을 때: WHERE 절로 필터링
         # ✏️ [실습] user_id 조건으로 필터링하는 SELECT 쿼리를 완성하세요.
         cursor.execute(
-            "여기에 SELECT ~ WHERE 쿼리를 작성하세요", (user_id,)
+            "SELECT * FROM messages WHERE user_id = ?", (user_id,)
         )
     else:
         # user_id 조건이 없을 때: 전체 조회

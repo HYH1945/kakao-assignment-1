@@ -32,7 +32,7 @@ def create_message(request: MessageRequest):
     # ✏️ [실습] messages 테이블에 user_id와 content를 삽입하는 INSERT 쿼리를 완성하세요.
     # SQL 인젝션 방지를 위해 값 자리에는 ? 를 사용합니다.
     cursor.execute(
-        "여기에 INSERT 쿼리를 작성하세요",
+        "INSERT INTO messages (user_id, content) VALUES (?, ?)",
         (request.user_id, request.content)
     )
 

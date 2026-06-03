@@ -17,14 +17,15 @@ def delete_message(message_id: int):
     cursor = conn.cursor()
 
     # ✏️ [실습] message_id에 해당하는 메시지를 삭제하는 DELETE 쿼리를 작성하세요.
-    cursor.execute("여기에 DELETE 쿼리를 작성하세요", (message_id,))
+    cursor.execute("DELETE FROM messages WHERE id = ?", (message_id,))
     conn.commit()
     deleted = cursor.rowcount
     conn.close()
 
     # ✏️ [실습] 삭제된 행이 없으면(deleted == 0) 404 에러를 반환하세요.
     # 여기에 조건문을 작성하세요
-
+    if deleted == 0:
+        raise HTTPException(status_code=404, detail="메세지를 찾을 수 없습니다")
     return {"status": "deleted", "message_id": message_id}
 
 @app.get("/messages", response_model=list[MessageResponse])

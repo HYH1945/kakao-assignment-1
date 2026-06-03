@@ -11,6 +11,16 @@
 #     else:
 #         return {"status": "error", "reason": "사용자 없음"}
 
+def send(user, msg):
+    if not user:
+        return {}
+    if not msg:
+        return {}
+    if len(msg) > 200:
+        return {}
+    return {}
+
+
 def send_message(user, message):
     if not user:
         return {"status": "error", "reason": "사용자 없음"}

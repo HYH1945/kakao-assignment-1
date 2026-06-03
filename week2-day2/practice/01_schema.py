@@ -5,12 +5,19 @@ cursor = conn.cursor()
 
 # Step 1. users 테이블 생성
 cursor.execute("""
-   
+CREATE TABLE users(
+    id  INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL)
 """)
 
 # Step 2. messages 테이블 생성
 cursor.execute("""
-    
+CREATE TABLE messages(
+    id  INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    content TEXT NOT NULL, 
+    FOREIGN KEY (user_id) REFERENCES user(id)
+                             )
 """)
 
 conn.commit()
