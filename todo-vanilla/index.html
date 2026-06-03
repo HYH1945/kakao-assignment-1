@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Todo App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="todo-card" aria-label="Todo 앱">
+      <header class="todo-header">
+        <p class="todo-eyebrow">Productivity</p>
+        <h1 class="todo-title">Todo List</h1>
+        <p class="todo-description">이번 주의 날짜를 넘기며, 선택한 날짜의 할 일만 관리해보세요.</p>
+      </header>
+
+      <section class="week-view" aria-label="주간 뷰">
+        <button type="button" id="previous-week-button" class="week-nav-button">이전 주</button>
+        <div class="week-title-area">
+          <p class="week-label">현재 주차</p>
+          <p id="week-range-text" class="week-range-text"></p>
+        </div>
+        <button type="button" id="next-week-button" class="week-nav-button">다음 주</button>
+      </section>
+
+      <div id="week-date-grid" class="week-date-grid" aria-label="이번 주 날짜 목록"></div>
+
+      <form id="todo-form" class="todo-form">
+        <label class="sr-only" for="todo-input">Todo 입력</label>
+        <input
+          id="todo-input"
+          class="todo-input"
+          type="text"
+          placeholder="새 Todo를 입력하세요"
+          autocomplete="off"
+        />
+        <button class="todo-add-button" type="submit">추가</button>
+      </form>
+
+      <p id="message-area" class="message-area" aria-live="polite"></p>
+
+      <div class="todo-filter-group" role="tablist" aria-label="Todo 상태 필터">
+        <button type="button" class="todo-filter-button is-active" data-filter="all" aria-pressed="true">전체</button>
+        <button type="button" class="todo-filter-button" data-filter="active" aria-pressed="false">진행 중</button>
+        <button type="button" class="todo-filter-button" data-filter="completed" aria-pressed="false">완료</button>
+      </div>
+
+      <section class="todo-list-section" aria-labelledby="todo-list-title">
+        <div class="section-header">
+          <h2 id="todo-list-title" class="section-title">Todo 목록</h2>
+          <span id="todo-count" class="todo-count">0개</span>
+        </div>
+        <ul id="todo-list" class="todo-list"></ul>
+      </section>
+    </section>
+  </main>
+
+  <template id="todo-item-template">
+    <li class="todo-item">
+      <div class="todo-content">
+        <span class="todo-text"></span>
+        <span class="todo-date-badge"></span>
+      </div>
+      <div class="todo-actions">
+        <button type="button" class="todo-action-button edit-button">수정</button>
+        <button type="button" class="todo-action-button complete-button">완료</button>
+        <button type="button" class="todo-action-button delete-button">삭제</button>
+      </div>
+    </li>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
