@@ -1,0 +1,43 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #222;
+  background: #fafafa;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* 실습 / 정답 전환 네비게이션 */
+.mode-nav {
+  display: flex;
+  gap: 0;
+  padding: 0.75rem 1rem;
+  background: #1a1a2e;
+  justify-content: center;
+}
+
+.mode-nav a {
+  padding: 0.4rem 1.4rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+
+.mode-nav a:hover {
+  color: #fff;
+}
+
+.mode-nav a.active {
+  background: #fff;
+  color: #1a1a2e;
+}

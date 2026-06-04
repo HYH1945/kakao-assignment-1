@@ -35,10 +35,16 @@ def get_review(univ_name: str):
     else:
         raise HTTPException(status_code=404, detail=f"{univ_name}리뷰를 찾을 수 없습니다.")
 
+@app.get("/reviews/{univ_name}")
+def get_review(univ_name: str):
+    review = univ_reviews.get(univ_name)
+    if review:
+        return {"univ_name": univ_name, "review": review}
+    else:
+        raise HTTPException(status_code=404, detail=f"{univ_name} 리뷰를 찾을 수 없습니다.")
 
 # [문제 4] 새로운 리뷰 등록 API (POST) 구현하기
 # 경로: /reviews
-# 아래 코드를 활용해 작성하세요
 @app.post("/reviews")
 def add_review(request: ReviewCreate):
     univ_reviews[request.univ_name] = request.review

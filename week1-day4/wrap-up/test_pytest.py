@@ -11,6 +11,6 @@ def validate_message(message: str) -> str:
     return message
 
 def test_validate_message():
-    assert validate_message("안녕") == "안녕"
+    assert validate_message("안녕") == ""
     assert validate_message("") == "메시지를 입력하세요"
     assert validate_message("a" * 501) == "메시지가 너무 깁니다"
