@@ -1,11 +1,13 @@
+import { FILTER_TYPES } from '../constants/filterTypes'; // Enum Import
+
 // currentFilter: 현재 선택된 탭
 // onFilterChange: 탭을 클릭했을 때 부모(App.jsx)의 상태를 바꿔줄 함수
 export default function FilterTabs({ currentFilter, onFilterChange }) {
-  // 필터 탭의 종류와 라벨 텍스트를 정의한 배열입니다.
+  // 하드코딩된 문자열 대신 Enum 객체의 값을 사용합니다.
   const tabs = [
-    { id: 'all', label: '전체' },
-    { id: 'active', label: '진행중' },
-    { id: 'completed', label: '완료' },
+    { id: FILTER_TYPES.ALL, label: '전체' },
+    { id: FILTER_TYPES.ACTIVE, label: '진행중' },
+    { id: FILTER_TYPES.COMPLETED, label: '완료' },
   ];
 
   return (

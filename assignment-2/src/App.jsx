@@ -4,6 +4,7 @@ import TodoList from './components/TodoList';
 import FilterTabs from './components/FilterTabs';
 import WeekView from './components/WeekView'; 
 import { getTodayDateString } from './utils/dateUtils'; 
+import { FILTER_TYPES } from './constants/filterTypes'; // Enum Import
 import './App.css'; 
 
 function App() {
@@ -26,7 +27,8 @@ function App() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
   }, [todos]);
 
-  const [filter, setFilter] = useState('all');
+  // Enum을 사용하여 초기 상태를 안전하게 설정합니다.
+  const [filter, setFilter] = useState(FILTER_TYPES.ALL);
   
   const [selectedDate, setSelectedDate] = useState(() => getTodayDateString());
 
@@ -64,8 +66,9 @@ function App() {
     const matchesDate = todo.date === selectedDate;
     if (!matchesDate) return false;
 
-    if (filter === 'active') return !todo.completed;
-    if (filter === 'completed') return todo.completed;
+    // 매직 스트링 대신 Enum을 사용하여 안전하게 비교합니다.
+    if (filter === FILTER_TYPES.ACTIVE) return !todo.completed;
+    if (filter === FILTER_TYPES.COMPLETED) return todo.completed;
     return true; 
   });
 
