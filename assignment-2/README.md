@@ -1,16 +1,32 @@
-# React + Vite
+# 카카오테크 부트캠프 - Todo App (React 마이그레이션)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+이 프로젝트는 기존 Vanilla JS로 작성된 Todo 앱을 **React + Vite + Tailwind CSS** 스택으로 마이그레이션하고 고도화한 결과물입니다.
 
-Currently, two official plugins are available:
+## 🚀 구현된 필수 기능 및 특징
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### 1. 할 일 CRUD 및 상태 관리 (Custom Hook)
+- `useTodos`라는 커스텀 훅을 만들어 데이터 관련 비즈니스 로직과 UI를 완벽하게 분리했습니다.
+- 입력창이 비어있을 때 경고(`alert`)를 띄워 **빈 입력값 제출을 방지**합니다.
+- 항목 텍스트를 더블 클릭하거나 수정 버튼을 누르면 부드럽게 인라인 입력창으로 전환됩니다.
 
-## React Compiler
+### 2. 필터링 로직 (Enum 안전성)
+- `전체`, `진행중`, `완료` 세 가지 탭을 제공하며 즉시 상태가 반영됩니다.
+- 필터 조건으로 쓰이는 문자열들은 `FILTER_TYPES`라는 상수 객체(Enum)로 묶어서 관리하여 오타로 인한 버그를 원천 차단했습니다.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 3. 일간 뷰 & 주간 뷰 결합 (`WeekView`)
+- 화면 상단에 이번 주의 7일치 날짜를 보여주는 주간 달력이 배치되어 있습니다.
+- 특정 날짜를 클릭하면 하단 리스트가 해당 날짜의 할 일만 필터링하여 보여줍니다. (일간 뷰 연동)
+- 각 날짜 칩 하단에 그 날짜에 해당하는 할 일의 총 개수가 표시됩니다.
 
-## Expanding the ESLint configuration
+### 4. 로컬 스토리지 데이터 영구 보존
+- `useEffect`를 활용하여 할 일이 변경될 때마다 브라우저의 로컬 스토리지(`vanilla-todo-app-data`)에 자동 저장됩니다.
+- 페이지를 새로고침 하거나 브라우저를 다시 켜도 데이터가 **안전하게 복원(유지)**됩니다.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 5. 예외 및 빈 상태(Empty State) 처리
+- 해당 날짜나 필터에 등록된 할 일이 하나도 없을 경우, 빈 화면이 아니라 **"할 일이 없습니다" 라는 시각적 피드백(Empty State UI)**을 제공하여 사용자 경험을 높였습니다.
+
+## 💻 실행 방법
+```bash
+npm install
+npm run dev
+```
