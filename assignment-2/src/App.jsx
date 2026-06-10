@@ -1,72 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import TodoInput from './components/TodoInput';
 import TodoList from './components/TodoList';
 import FilterTabs from './components/FilterTabs';
 import WeekView from './components/WeekView'; 
 import { getTodayDateString } from './utils/dateUtils'; 
-import { FILTER_TYPES } from './constants/filterTypes'; // Enum Import
+import { FILTER_TYPES } from './constants/filterTypes'; 
+import { useTodos } from './hooks/useTodos'; // 커스텀 훅 Import
 import './App.css'; 
 
 function App() {
-  const STORAGE_KEY = 'vanilla-todo-app-data';
+  // 1. 비즈니스 로직(데이터)은 커스텀 훅이 전담합니다.
+  const { 
+    todos, 
+    handleAddTodo, 
+    handleToggleComplete, 
+    handleDeleteTodo, 
+    handleEditTodo 
+  } = useTodos();
 
-  const [todos, setTodos] = useState(() => {
-    const savedTodos = localStorage.getItem(STORAGE_KEY);
-    if (savedTodos) {
-      try {
-        return JSON.parse(savedTodos);
-      } catch (e) {
-        console.error("로컬 스토리지 데이터를 파싱하는 중 오류가 발생했습니다.", e);
-        return [];
-      }
-    }
-    return []; 
-  });
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
-  }, [todos]);
-
-  // Enum을 사용하여 초기 상태를 안전하게 설정합니다.
+  // 2. UI와 관련된 상태(필터, 선택된 날짜)만 App 컴포넌트가 직접 관리합니다.
   const [filter, setFilter] = useState(FILTER_TYPES.ALL);
-  
   const [selectedDate, setSelectedDate] = useState(() => getTodayDateString());
 
-  const handleAddTodo = (text) => {
-    const newTodo = {
-      id: Date.now(),
-      text,
-      completed: false,
-      date: selectedDate, 
-    };
-    setTodos((prev) => [newTodo, ...prev]);
-  };
-
-  const handleToggleComplete = (id) => {
-    setTodos((prev) =>
-      prev.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
-  };
-
-  const handleDeleteTodo = (id) => {
-    setTodos((prev) => prev.filter((todo) => todo.id !== id));
-  };
-
-  const handleEditTodo = (id, newText) => {
-    setTodos((prev) =>
-      prev.map((todo) =>
-        todo.id === id ? { ...todo, text: newText } : todo
-      )
-    );
-  };
-
+  // 필터링 과정: 1. 날짜 필터링 -> 2. 상태 필터링
   const filteredTodos = todos.filter((todo) => {
     const matchesDate = todo.date === selectedDate;
     if (!matchesDate) return false;
 
-    // 매직 스트링 대신 Enum을 사용하여 안전하게 비교합니다.
     if (filter === FILTER_TYPES.ACTIVE) return !todo.completed;
     if (filter === FILTER_TYPES.COMPLETED) return todo.completed;
     return true; 
@@ -87,7 +47,8 @@ function App() {
             todos={todos} 
           />
 
-          <TodoInput onAdd={handleAddTodo} />
+          {/* 할 일을 추가할 때 현재 선택된 날짜를 함께 넘겨줍니다. */}
+          <TodoInput onAdd={(text) => handleAddTodo(text, selectedDate)} />
           <FilterTabs currentFilter={filter} onFilterChange={setFilter} />
 
           <TodoList 
