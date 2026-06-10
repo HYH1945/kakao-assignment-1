@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { 
   getMondayOfWeek, 
   getDateOffsetString, 
@@ -13,8 +13,16 @@ import {
 // todos: 해당 날짜의 할 일 개수를 표시하기 위해 전체 데이터를 받습니다.
 export default function WeekView({ selectedDate, onSelectDate, todos }) {
   // 현재 화면에 보여주고 있는 주(Week)의 기준일(월요일)을 관리하는 상태입니다.
-  // 처음 렌더링될 때는 선택된 날짜가 속한 주의 월요일을 기준으로 삼습니다.
-  const [weekAnchorDate, setWeekAnchorDate] = useState(() => getMondayOfWeek(selectedDate));
+  // 새로고침 후에도 유지하기 위해 로컬 스토리지에서 먼저 값을 찾아옵니다.
+  const [weekAnchorDate, setWeekAnchorDate] = useState(() => {
+    const saved = localStorage.getItem('todo-week-start');
+    return saved || getMondayOfWeek(selectedDate);
+  });
+
+  // 주간 뷰의 기준 날짜가 바뀔 때마다 스토리지에 저장합니다.
+  useEffect(() => {
+    localStorage.setItem('todo-week-start', weekAnchorDate);
+  }, [weekAnchorDate]);
   
   const today = getTodayDateString();
 

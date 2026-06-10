@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TodoInput from './components/TodoInput';
 import TodoList from './components/TodoList';
 import FilterTabs from './components/FilterTabs';
@@ -20,7 +20,15 @@ function App() {
 
   // 2. UI와 관련된 상태(필터, 선택된 날짜)만 App 컴포넌트가 직접 관리합니다.
   const [filter, setFilter] = useState(FILTER_TYPES.ALL);
-  const [selectedDate, setSelectedDate] = useState(() => getTodayDateString());
+  
+  const [selectedDate, setSelectedDate] = useState(() => {
+    return localStorage.getItem('todo-selected-date') || getTodayDateString();
+  });
+
+  // 선택된 날짜가 바뀔 때마다 스토리지에 저장하여 새로고침 시 유지
+  useEffect(() => {
+    localStorage.setItem('todo-selected-date', selectedDate);
+  }, [selectedDate]);
 
   // 필터링 과정: 1. 날짜 필터링 -> 2. 상태 필터링
   const filteredTodos = todos.filter((todo) => {
