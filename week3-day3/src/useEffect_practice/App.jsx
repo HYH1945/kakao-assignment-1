@@ -17,43 +17,45 @@ export default function TimeLoopMission() {
   // clearInterval(id)         : setInterval 이 반환한 id 로 반복 중단
   //                            → id 는 위에서 저장한 변수를 활용합니다.
   // ================================================================
-  useEffect(
-    () => {
-      // [문제 1] isSolved 또는 isPaused 가 true 이면 early return 하세요.
+  useEffect(() => {
+    // [문제 1] isSolved 또는 isPaused 가 true 이면 early return 하세요.
+    if (isSolved || isPaused) return;
 
-      const interval = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            setLoopCount((c) => c + 1);
-            return 15;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          setLoopCount((c) => c + 1);
+          return 15;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
-      // [문제 2] interval 을 정리하는 cleanup 함수를 반환하세요.
-    },
-    [
-      /* [문제 3] 의존성 배열을 채우세요. 타이머가 다시 시작돼야 하는 상황을 생각해보세요.
+    // [문제 2] interval 을 정리하는 cleanup 함수를 반환하세요.
+    return () => clearInterval(interval);
+  }, [
+    isSolved,
+    isPaused,
+    /* [문제 3] 의존성 배열을 채우세요. 타이머가 다시 시작돼야 하는 상황을 생각해보세요.
                미션이 완수됐을 때? 일시정지 상태가 바뀔 때? */
-    ],
-  );
+  ]);
 
   // ================================================================
   // useEffect 2 — 탭 타이틀 업데이트
   // ================================================================
-  useEffect(
-    () => {
-      document.title =
-        loopCount > 0 ? `[루프 ${loopCount}회] 타임루프 작전` : "타임루프 작전";
+  useEffect(() => {
+    document.title =
+      loopCount > 0 ? `[루프 ${loopCount}회] 타임루프 작전` : "타임루프 작전";
 
-      // [문제 4] 탭 타이틀을 "실습" 으로 되돌리는 cleanup 함수를 반환하세요.
-      //   힌트: document.title = "실습"; 을 cleanup 안에 작성하세요.
-    },
-    [
-      /* [문제 5] 의존성 배열을 채우세요. 탭 타이틀이 바뀌어야 하는 상황은 언제인가요? */
-    ],
-  );
+    // [문제 4] 탭 타이틀을 "실습" 으로 되돌리는 cleanup 함수를 반환하세요.
+    //   힌트: document.title = "실습"; 을 cleanup 안에 작성하세요.
+    return () => {
+      document.title = "실습";
+    };
+  }, [
+    loopCount,
+    /* [문제 5] 의존성 배열을 채우세요. 탭 타이틀이 바뀌어야 하는 상황은 언제인가요? */
+  ]);
 
   function handleCollectClue() {
     if (!isSolved && cluesFound < 3) setCluesFound((c) => c + 1);

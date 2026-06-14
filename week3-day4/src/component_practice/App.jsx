@@ -3,31 +3,25 @@
 
 import { POSTS } from "./data/posts";
 import "@/App.css";
+import Header from "./Header";
+import PostCard from "./PostCard";
+import Footer from "./Footer";
 
 export default function App() {
   return (
     <div className="app">
       {/* ── 헤더 ─────────────────────────────────── */}
-      <header className="header">
-        <h1>📚 React 피드</h1>
-        <span className="online-badge">● 3명 접속 중</span>
-      </header>
+      <Header />
 
       {/* ── 게시글 목록 ──────────────────────────── */}
       <ul className="post-list">
         {POSTS.map((post) => (
-          <li key={post.id} className="post-card">
-            <div className="post-author">
-              <span className="avatar">{post.avatar}</span>
-              <strong>{post.author}</strong>
-            </div>
-            <p className="post-content">{post.content}</p>
-          </li>
+          <PostCard key={post.id} post={post} />
         ))}
       </ul>
 
       {/* ── 하단 통계 ─────────────────────────────── */}
-      <footer className="stats-footer">게시글 {POSTS.length}개</footer>
+      <Footer postCount={POSTS.length} />
     </div>
   );
 }

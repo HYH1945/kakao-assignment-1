@@ -1,4 +1,3 @@
-// app/posts/[postId]/edit/page.tsx — 게시글 수정 폼 (Server Component)
 import Link from "next/link";
 import { updatePost } from "@/app/actions";
 
@@ -32,11 +31,13 @@ export default async function EditPostPage({
   // bind(null, post.id): updatePost의 첫 번째 인자(postId)를 미리 고정
   const boundUpdatePost = updatePost.bind(null, post.id);
 
+  const BASE_PATH = process.env.BASE_PATH ?? "";
+
   return (
     <main>
       <div className="flex items-center gap-3 mb-6">
         <Link
-          href={`/posts/${post.id}`}
+          href={`${BASE_PATH}/posts/${post.id}`}
           className="text-gray-400 hover:text-gray-600 text-sm"
         >
           ← 상세로
@@ -49,7 +50,10 @@ export default async function EditPostPage({
         className="bg-white border border-gray-200 rounded-xl p-6 space-y-5"
       >
         <div className="space-y-1">
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="title"
+            className="block text-sm font-medium text-gray-700"
+          >
             제목
           </label>
           <input
@@ -62,7 +66,10 @@ export default async function EditPostPage({
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="content"
+            className="block text-sm font-medium text-gray-700"
+          >
             내용
           </label>
           <textarea

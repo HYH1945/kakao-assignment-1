@@ -2,6 +2,7 @@ import FamilyBanner from "./FamilyBanner";
 import ParentComponent from "./ParentComponent";
 import ChildComponent from "./ChildComponent";
 import "../App.css";
+import { useState } from "react";
 
 // ================================================================
 // 실습 1 — components/ 폴더 안의 컴포넌트를 완성하세요.
@@ -25,17 +26,25 @@ import "../App.css";
 //   [2-3] ParentComponent의 assets prop → parentAssets
 //   [2-4] ChildComponent의 assets → childAssets, onReceive → handleInherit
 // ================================================================
-
 function App() {
+  const [parentAssets, setParentAssets] = useState(500);
+  const [childAssets, setChildAssets] = useState(0);
+
+  const handleInherit = () => {
+    setChildAssets(childAssets + parentAssets);
+    setParentAssets(0);
+    alert("재산을 받았습니다!");
+  };
+
   return (
     <main className="app">
       <h1>useState 실습 — 가문의 재산</h1>
       <FamilyBanner familyName="React 가문" />
-      <ParentComponent name="아버지" assets={500} />
+      <ParentComponent name="아버지" assets={parentAssets} />
       <ChildComponent
         name="자녀"
-        assets={0}
-        onReceive={() => alert("재산을 받기로 했습니다!")}
+        assets={childAssets}
+        onReceive={handleInherit}
       />
     </main>
   );

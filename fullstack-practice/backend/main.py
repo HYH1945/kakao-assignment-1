@@ -1,53 +1,38 @@
+# main.py — FastAPI + SQLite Blog API
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import create_engine, Integer, String, Text, DateTime, select, or_
+from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, sessionmaker, Session
+from pydantic import BaseModel, field_validator
 from datetime import datetime, timezone
 from typing import Optional
+import os
 
-from fastapi import Depends, FastAPI, HTTPException
-from pydantic import BaseModel, field_validator
-from sqlalchemy import DateTime, Integer, String, Text, create_engine, select
-from sqlalchemy.orm import (
-    DeclarativeBase,
-    Mapped,
-    Session,
-    mapped_column,
-    sessionmaker,
-)
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
-# ─── ① 데이터베이스 연결 설정 ────────────────────────────────────────────
-# blog.db 파일 기반의 SQLite 경로를 설정합니다.
+# ─── DB 설정 ────────────────────────────────────────────
 DATABASE_URL = "sqlite:///./blog.db"
-
-# 데이터베이스와 실제 물리적인 연결을 관리하는 engine 객체를 생성합니다.
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# 실제 DB 조작을 수행할 세션 객체를 생성하는 SessionLocal 클래스를 정의합니다.
-SessionLocal = sessionmaker(bind=engine, autoflush=False)
 
-# 데이터베이스 테이블 선언 시 규칙 공유를 위한 기준 클래스입니다. (SQLAlchemy 2.0+ 표준)
 class Base(DeclarativeBase):
     pass
 
 
-# ─── ② Model (Python 클래스와 DB 테이블 매핑) ────────────────────────────
+# ─── 모델 (DB 테이블) ────────────────────────────────────
 class Post(Base):
-    __tablename__ = "posts"  # 실제 DB에 생성될 테이블 이름
-
-    # 기본키 고유 식별 번호 (인덱스 처리)
+    __tablename__ = "posts"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    # 제목: 최대 200자, 빈 값 불허
     title: Mapped[str] = mapped_column(String(200), nullable=False)
-    # 본문: 텍스트 타입, 빈 값 불허
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    # 작성 시간: 기본값으로 현재 시스템의 UTC 표준 시간이 저장됨
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=lambda: datetime.now(timezone.utc)
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
-# 서버 시작 시 정의된 설계도(Base)를 기반으로 아직 DB에 테이블이 없다면 자동 생성합니다.
 Base.metadata.create_all(bind=engine)
 
 
-# ─── Pydantic 스키마 (데이터 유효성 검증용 구조체) ─────────────────────────
+# ─── Pydantic 스키마 ────────────────────────────────────
 class PostCreate(BaseModel):
     title: str
     content: str
@@ -73,65 +58,87 @@ class PostResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ─── FastAPI 앱 초기화 ──────────────────────────────────
+# ─── FastAPI 앱 & CORS ──────────────────────────────────
 app = FastAPI(title="Blog API")
 
+# [실습 1] Direct Fetch 방식에서 CORS 설정이 필요한 이유
+#   브라우저(http://localhost:3000)가 다른 출처의 FastAPI(http://localhost:8000)를
+#   직접 호출할 때, 브라우저의 동일 출처 정책(SOP)에 의해 요청이 차단됩니다.
+#   → allow_origins 에 Next.js 주소를 등록해 허용합니다.
+#
+# [실습 1] Route Handler 방식에서는 CORS 불필요
+#   브라우저 → Next.js Route Handler(같은 출처) → FastAPI 순서로 호출되며,
+#   FastAPI 를 호출하는 주체가 브라우저가 아닌 서버이므로 CORS 제약이 없습니다.
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
-# ─── DB 세션 의존성 주입 (get_db) ──────────────────────────────────────
+# 안전하게 허용할 출처 리스트 생성
+origins = [
+    "http://localhost:3000",  # 로컬 테스트용은 상시 허용
+    FRONTEND_URL,             # 배포된 진짜 프론트엔드 주소 허용
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,    # 3. origins 리스트 주입
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# ─── DB 세션 의존성 ──────────────────────────────────────
 def get_db():
-    db = SessionLocal()  # 요청이 올 때마다 세션 창구 개설
+    db = SessionLocal()
     try:
-        yield db         # 라우터 함수 내부로 세션 인스턴스를 전달
+        yield db
     finally:
-        db.close()       # API 통신 처리가 완료되면 세션을 안전하게 닫고 자원 반환
+        db.close()
 
 
-# 중복 조회를 방지하고 가독성을 높이기 위해 공통으로 사용하는 단건 조회 헬퍼 함수
-def _get_post_or_none(db: Session, post_id: int) -> Post | None:
-    return db.scalar(select(Post).where(Post.id == post_id))
-
-
-# ─── ③ 데이터 조회 API (전체 조회) ──────────────────────────────────────────
+# ─── GET /posts ──────────────────────────────────────────
 @app.get("/posts", response_model=list[PostResponse])
 def get_posts(db: Session = Depends(get_db)):
-    # 전체 게시글 정보를 리스트 형태로 동기식 반환합니다.
-    return db.scalars(select(Post)).all()
+    # [실습 3] TODO: 옵셔널 쿼리 파라미터 q 를 추가하고, 서버사이드 필터링을 구현해보세요.
+    #
+    #   1. 함수 인자에 q: Optional[str] = None 을 추가하세요.
+    #      (fastapi.Query 를 사용해 description 을 추가하면 더 좋습니다)
+    #
+    #   2. q 가 있을 때는 SQLAlchemy or_() 를 활용해 title 또는 content 에
+    #      검색어가 포함된 게시글만 반환하세요.
+    #      → or_() 는 이미 임포트되어 있습니다
+    #      → Post.title.contains(q), Post.content.contains(q)
+    #
+    #   3. q 가 없을 때는 전체 목록을 반환하세요.
+    return db.execute(select(Post)).scalars().all()
 
 
+# ─── GET /posts/{post_id} ────────────────────────────────
 @app.get("/posts/{post_id}", response_model=PostResponse)
 def get_post(post_id: int, db: Session = Depends(get_db)):
-    # ✏️ Q1. Post 테이블에서 id가 post_id와 일치하는 데이터를 찾는 쿼리문(stmt)을 작성하고 실행하세요.
-    # 힌트: select(Post).where(조건)와 db.scalar(stmt)를 조합합니다.
-    stmt = select(Post).where(____________________)
-    post = db.scalar(________)
-
-    # ✏️ Q2. 만약 일치하는 게시글(post)이 없다면, 사용자에게 404 에러를 반환하세요.
-    # 힌트: raise HTTPException(status_code=404, detail="...")을 사용합니다.
+    post = db.execute(select(Post).where(Post.id == post_id)).scalar_one_or_none()
     if not post:
-        raise ___________________________________________
-
+        raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다")
     return post
 
 
+# ─── POST /posts ─────────────────────────────────────────
 @app.post("/posts", response_model=PostResponse, status_code=201)
 def create_post(data: PostCreate, db: Session = Depends(get_db)):
     try:
         post = Post(title=data.title, content=data.content)
-        
-        # ✏️ Q1. 데이터를 세션에 임시 추가하고, 실제 DB에 반영한 뒤 최신 정보를 객체에 동기화하세요.
-        db._______________(post)
-        db._______________()
-        db._______________(post)
+        db.add(post)      # 트랜잭션에 추가 (아직 DB에 기록되지 않음)
+        db.commit()       # DB에 영구 반영
+        db.refresh(post)  # id, created_at 등 DB 자동 생성 값 재조회
         return post
     except Exception as e:
-        # ✏️ Q2. 에러가 발생했을 때 DB를 원래 상태로 안전하게 되돌리는 코드를 작성하세요.
-        db._______________()
+        db.rollback()     # 실패 시 변경사항 전체 취소
         raise HTTPException(status_code=500, detail=f"게시글 생성 실패: {str(e)}")
 
 
+# ─── PUT /posts/{post_id} ────────────────────────────────
 @app.put("/posts/{post_id}", response_model=PostResponse)
 def update_post(post_id: int, data: PostUpdate, db: Session = Depends(get_db)):
-    post = _get_post_or_none(db, post_id)
+    post = db.execute(select(Post).where(Post.id == post_id)).scalar_one_or_none()
     if not post:
         raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다")
     try:
@@ -139,25 +146,24 @@ def update_post(post_id: int, data: PostUpdate, db: Session = Depends(get_db)):
             post.title = data.title
         if data.content is not None:
             post.content = data.content
-            
-        # ✏️ Q1. 변경된 사항을 데이터베이스에 반영하고 최신 정보로 동기화하세요.
-        db._______________()
-        db._______________(post)
+        db.commit()
+        db.refresh(post)
         return post
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"게시글 수정 실패: {str(e)}")
 
 
+# ─── DELETE /posts/{post_id} ─────────────────────────────
 @app.delete("/posts/{post_id}", status_code=204)
 def delete_post(post_id: int, db: Session = Depends(get_db)):
-    post = _get_post_or_none(db, post_id)
+    post = db.execute(select(Post).where(Post.id == post_id)).scalar_one_or_none()
     if not post:
         raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다")
     try:
-        # ✏️ Q1. 대상을 삭제 목록에 올리고 데이터베이스에 최종 기록하세요.
-        db._______________(post)
-        db._______________()
+        db.delete(post)  # 삭제 대상으로 표시
+        db.commit()      # DB에서 영구 삭제
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"게시글 삭제 실패: {str(e)}")
+    # 204 No Content: 삭제 성공 시 응답 바디 없음

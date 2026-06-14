@@ -7,6 +7,15 @@
 //   - App.jsx에 useState가 추가되면 자동으로 동작합니다.
 // ================================================================
 
-export default function ChildComponent() {
-  return <div className="child-card">{/* TODO */}</div>;
+export default function ChildComponent({ name, assets, onReceive }) {
+  return (
+    <div className="child-card">
+      <p>
+        {name} - {assets}원
+      </p>
+      <button type="button" onClick={onReceive}>
+        재산 받기
+      </button>
+    </div>
+  );
 }

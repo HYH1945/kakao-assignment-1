@@ -45,19 +45,3 @@ export async function updatePost(postId: number, formData: FormData) {
   revalidateTag("posts-list");
   redirect(`/posts/${postId}`);
 }
-
-// ─── 게시글 삭제 ─────────────────────────────────────────
-export async function deletePost(postId: number) {
-  const res = await fetch(`${process.env.FASTAPI_URL}/posts/${postId}`, {
-    method: "DELETE",
-  });
-
-  if (!res.ok) {
-    // 204 No Content가 아닌 경우에만 에러 처리
-    const error = await res.json().catch(() => ({}));
-    throw new Error(error.detail ?? "게시글 삭제에 실패했습니다");
-  }
-
-  revalidateTag("posts-list");
-  redirect("/posts");
-}

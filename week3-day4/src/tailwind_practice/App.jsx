@@ -1,7 +1,5 @@
 /**
- * Tailwind CSS 실습
- *
- * 각 섹션 주석을 읽고, 표시된 요소의 className에 Tailwind 클래스를 추가하세요.
+ * Tailwind CSS 실습 — 정답 (practice_02)
  */
 
 export default function App() {
@@ -17,17 +15,17 @@ export default function App() {
           </p>
         </header>
 
-        {/* ── 1. 텍스트 크기 · 굵기 ───────────────────────────── */}
         <section className="flex flex-col gap-4">
           <h2 className="text-center text-base font-semibold text-slate-800">
             1. 텍스트 크기 · 굵기
           </h2>
-
           <div className="flex flex-col gap-4 rounded-xl border border-dashed border-amber-300 bg-amber-50/60 p-8">
             <div className="rounded-lg bg-white px-6 py-5 ring-1 ring-slate-100">
               {/* 문제
               아래 제목 「Tailwind 연습」의 글자 크기를 3xl, 굵기를 bold로 맞춰 주세요. */}
-              <h3 className="">Tailwind 연습</h3>
+              <h3 className="text-3xl font-bold text-slate-900">
+                Tailwind 연습
+              </h3>
             </div>
             <p className="text-sm leading-relaxed text-slate-500">
               위 제목만 스타일을 적용하면 됩니다.
@@ -35,17 +33,17 @@ export default function App() {
           </div>
         </section>
 
-        {/* ── 2. 반응형 ───────────────────────────────────────── */}
         <section className="flex flex-col gap-4">
           <h2 className="text-center text-base font-semibold text-slate-800">
             2. 반응형
           </h2>
-
           <div className="flex flex-col gap-4 rounded-xl border border-dashed border-sky-300 bg-sky-50/60 p-8">
             <div className="rounded-lg bg-white px-6 py-5 ring-1 ring-slate-100">
               {/* 문제
               제목은 모바일에서 text-xl, md(768px~) 이상에서 text-4xl 이 되게 해 주세요. */}
-              <h3 className="">화면 크기에 따라 달라지는 제목</h3>
+              <h3 className="text-xl font-semibold text-slate-900 md:text-4xl">
+                화면 크기에 따라 달라지는 제목
+              </h3>
             </div>
             <p className="text-sm leading-relaxed text-slate-500">
               브라우저 창 너비를 줄였다 늘려 보세요.
@@ -53,25 +51,22 @@ export default function App() {
           </div>
         </section>
 
-        {/* ── 3. 상태 변화 (Hover) ────────────────────────────── */}
         <section className="flex flex-col gap-4">
           <h2 className="text-center text-base font-semibold text-slate-800">
             3. 상태 변화 (Hover)
           </h2>
-
           <div className="flex justify-center rounded-xl border border-dashed border-violet-300 bg-violet-50/60 p-8">
             {/* 문제
             버튼: 배경 indigo-600, 흰 글씨, 호버 시 배경 indigo-800 */}
             <button
               type="button"
-              className="inline-flex items-center rounded-lg px-6 py-3 text-sm font-medium"
+              className="inline-flex items-center rounded-lg bg-indigo-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-indigo-800"
             >
               호버해보세요
             </button>
           </div>
         </section>
 
-        {/* ── 4. Flex · 마진 · 패딩 ───────────────────────────── */}
         <section className="flex flex-col gap-4">
           <h2 className="text-center text-base font-semibold text-slate-800">
             4. Flex · 마진 · 패딩
@@ -80,7 +75,7 @@ export default function App() {
           <div className="flex flex-col gap-4 rounded-xl border border-dashed border-emerald-300 bg-emerald-50/60 p-8">
             {/* 문제
             프로필 바: flex 가로 배치, 양끝 정렬(justify-between), 세로 가운데(items-center), 안쪽 패딩 p-4, 배경 white, 모서리 rounded-lg */}
-            <div className="">
+            <div className="flex items-center justify-between rounded-lg bg-white p-4">
               <span className="font-medium text-slate-800">프로필</span>
               <button
                 type="button"
