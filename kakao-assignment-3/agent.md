@@ -14,7 +14,11 @@ kakao-assignment-3/
 ├── backend/          # FastAPI 백엔드 루트
 │   ├── .venv/        # 파이썬 가상환경
 │   ├── .env.local    # 백엔드 환경변수
-│   ├── main.py       # FastAPI 진입점 (엔드포인트, DB, 모델 포함)
+│   ├── main.py       # FastAPI 진입점
+│   ├── database.py   # SQLite 연결 및 세션 관리
+│   ├── models.py     # SQLAlchemy ORM 모델
+│   ├── schemas.py    # Pydantic 데이터 스키마
+│   ├── routers/      # API 엔드포인트 폴더
 │   ├── requirements.txt
 │   └── todos.db      # SQLite 데이터베이스 파일
 └── frontend/         # Next.js 프론트엔드 루트
@@ -28,7 +32,8 @@ kakao-assignment-3/
     │       ├── page.tsx
     │       ├── new/page.tsx
     │       └── [todoId]/page.tsx
-    └── components/   # UI 컴포넌트 폴더
+    ├── components/   # UI 컴포넌트 폴더
+    └── types/        # TypeScript 타입 인터페이스 폴더
 ```
 
 ## 1. 주요 기능 구현 스펙 통제 (UI/UX)
@@ -43,7 +48,7 @@ kakao-assignment-3/
 - **백엔드**: 고유 ID 생성(DB Auto Increment), 데이터 생성/수정/삭제 처리, 쿼리 파라미터를 통한 데이터 필터링(SQL), 날짜별 Todo 개수 집계 및 영구 저장(SQLite). 배열 `.filter()` 나 `localStorage` 로직은 프론트엔드에서 완전 배제합니다.
 
 ## 3. 데이터 구조 분리 (FastAPI)
-- **DB 모델 (SQLAlchemy)**: `id`, `content`, `is_completed`, `target_date`. 실제 SQLite DB(`todos.db`)와 직접 통신하는 엔티티.
+- **DB 모델 (SQLAlchemy)**: `id`, `content`, `is_completed`, `is_starred`, `target_date`. 실제 SQLite DB(`todos.db`)와 직접 통신하는 엔티티.
 - **API 스키마 (Pydantic)**: 클라이언트 데이터 검증용. 생성용(`TodoCreate`), 수정용(`TodoUpdate`), 응답용(`TodoResponse`) 분리. 클라이언트가 임의로 `id` 등을 조작하는 것을 원천 차단합니다.
 
 ## 4. Next.js 및 상태 관리 룰

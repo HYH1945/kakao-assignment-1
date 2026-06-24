@@ -1,0 +1,16 @@
+config:
+  target: "http://127.0.0.1:8000"
+  phases:
+    - duration: 10
+      arrivalRate: 150
+      name: "Moderate-heavy load (150 users per sec for 10 sec)"
+scenarios:
+  - name: "Read and Write Todos"
+    flow:
+      - get:
+          url: "/todos?target_date=2026-06-24"
+      - post:
+          url: "/todos"
+          json:
+            content: "Load Test Todo"
+            target_date: "2026-06-24"

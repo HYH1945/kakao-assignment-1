@@ -1,5 +1,7 @@
 import Link from "next/link";
+import CalendarStrip from "../../components/CalendarStrip";
 import FilterTabs from "../../components/FilterTabs";
+import SearchBar from "../../components/SearchBar";
 import TodoList from "../../components/TodoList";
 import { getTodos } from "../actions";
 
@@ -9,17 +11,19 @@ export default async function TodosPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const resolvedParams = await searchParams;
-  const filter = resolvedParams.filter || "ALL";
+  const filter = (resolvedParams.filter as string) || "ALL";
+  const search = (resolvedParams.search as string) || "";
   
-  // FastAPI 백엔드에서 데이터 페칭
-  const allTodos = await getTodos();
-
-  // 필터링 적용
-  const filteredTodos = allTodos.filter((todo: any) => {
-    if (filter === "ACTIVE") return !todo.is_completed;
-    if (filter === "COMPLETED") return todo.is_completed;
-    return true;
-  });
+  // 한국 시간(또는 로컬 타임존) 기준 오늘의 YYYY-MM-DD 구하기
+  let date = resolvedParams.date as string;
+  if (!date) {
+    const today = new Date();
+    const offset = today.getTimezoneOffset() * 60000;
+    date = new Date(today.getTime() - offset).toISOString().split('T')[0];
+  }
+  
+  // FastAPI 백엔드에 필터, 검색, 날짜 조건을 직접 넘겨서 페칭
+  const filteredTodos = await getTodos(filter, search, date);
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 flex justify-center">
@@ -35,8 +39,10 @@ export default async function TodosPage({
         </header>
 
         <main className="flex-1 p-6 flex flex-col gap-4">
+          <CalendarStrip selectedDate={date} />
+          <SearchBar />
           <FilterTabs />
-          <TodoList todos={filteredTodos} />
+          <TodoList initialTodos={filteredTodos} filter={filter} search={search} date={date} />
         </main>
       </div>
     </div>

@@ -10,6 +10,16 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* 과제 2 테마 색상(#672be0 등 보라색 계열)을 기본 blue 컬러셋에 매핑하여 앱 전체 테마 일괄 변경 */
+  --color-blue-50: #f5f3ff;
+  --color-blue-100: #ede9fe;
+  --color-blue-200: #ddd6fe;
+  --color-blue-400: #8b5cf6;
+  --color-blue-500: #7c3aed;
+  --color-blue-600: #672be0; /* 과제 2 Primary Color */
+  --color-blue-700: #5b21b6;
+  --color-blue-800: #4c1d95;
 }
 
 @media (prefers-color-scheme: dark) {

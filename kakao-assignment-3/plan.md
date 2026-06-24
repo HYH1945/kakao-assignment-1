@@ -47,19 +47,19 @@ System: AI 에이전트는 반드시 **'한 단계 구현 -> [테스트 포인�
   - [x] `cat frontend/.gitignore` 실행하여 `.env.local`이 추적 제외 처리되었는지 확인하라.
 
 ## 7. 서버 기반 상태별 필터링 구현
-- [ ] `?filter=active` URL 파라미터 연동, FastAPI에 필터 조건 전달하여 서버사이드 필터링 결과 반환 로직 구현.
+- [x] `?filter=active` URL 파라미터 연동, FastAPI에 필터 조건 전달하여 서버사이드 필터링 결과 반환 로직 구현.
 - **[테스트 포인트]**
-  - [ ] `pytest backend/tests/test_filter.py` 실행하여 필터 쿼리 파라미터에 따른 백엔드 응답 정상 작동을 확인하라.
-  - [ ] `npx playwright test frontend/tests/todo_filter.spec.ts` 실행하여 탭 클릭 시 주소창 URL 변경 및 렌더링 Pass를 확인하라.
+  - [x] `curl -s "http://localhost:8000/todos?is_completed=false"` 실행하여 `active` 건만 반환되는지 확인하라.
+  - [x] 프론트엔드 브라우저에서 '진행 중', '완료됨' 탭을 클릭했을 때 URL이 `?filter=ACTIVE` 등으로 변경되고 필터링된 결과가 노출되는지 확인하라.주소창 URL 변경 및 렌더링 Pass를 확인하라.
 
 ## 8. 서버 기반 Todo 검색 기능 구현
-- [ ] `?search=키워드` 파라미터 적용 및 FastAPI LIKE 조회 연동. 프론트엔드에 검색어 입력 디바운싱(Debouncing) 로직 추가.
+- [x] `?search=키워드` 파라미터 적용 및 FastAPI LIKE 조회 연동. 프론트엔드에 검색어 입력 디바운싱(Debouncing) 로직 추가.
 - **[테스트 포인트]**
-  - [ ] `pytest backend/tests/test_search.py` 실행하여 검색 API 정상 통신을 확인하라.
-  - [ ] `npx playwright test frontend/tests/todo_search.spec.ts` 실행하여 입력 후 지연(debounce) 검색 결과 렌더링 Pass를 확인하라.
+  - [x] 백엔드 로그를 관찰하며 프론트엔드 검색창에서 빠르게 타자를 쳤을 때 API 요청이 한 번만 날아오는지(Debouncing) 확인하라.
+  - [x] `npx playwright test frontend/tests/todo_search.spec.ts` 실행하여 입력 후 지연(debounce) 검색 결과 렌더링 Pass를 확인하라.
 
 ## 9. 서버 기반 일간/주간 뷰 연동 및 달력 UI 구현
-- [ ] 달력 UI 컴포넌트 구현 및 날짜 상태를 `?date=YYYY-MM-DD`로 관리. 백엔드에서 날짜별 패칭 및 개수 집계 로직 반환.
+- [x] 달력 UI 컴포넌트 구현 및 날짜 상태를 `?date=YYYY-MM-DD`로 관리. 백엔드에서 날짜별 패칭 및 개수 집계 로직 반환.
 - **[테스트 포인트]**
-  - [ ] `pytest backend/tests/test_date.py` 실행하여 날짜 쿼리 API 정상 작동을 확인하라.
-  - [ ] `npx playwright test frontend/tests/todo_calendar.spec.ts` 실행하여 날짜 이동 시 데이터 갱신 및 URL 유지 상태 Pass를 확인하라.
+  - [x] `pytest backend/tests/test_date.py` 실행하여 날짜 쿼리 API 정상 작동을 확인하라.
+  - [x] `npx playwright test frontend/tests/todo_calendar.spec.ts` 실행하여 날짜 이동 시 데이터 갱신 및 URL 유지 상태 Pass를 확인하라.
