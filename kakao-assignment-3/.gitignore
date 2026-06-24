@@ -1,0 +1,5 @@
+.venv/
+.env*
+todos.db
+playwright-report/
+test-results/
